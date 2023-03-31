@@ -1,6 +1,10 @@
 package ma.pfe.controllers;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import ma.pfe.dtos.StudentDto;
+import ma.pfe.dtos.StudentIdDto;
 import ma.pfe.services.StudentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,44 +15,44 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/student")
+@SecurityRequirement(name = "studentApi")
 public class StudentController {
-
     private StudentService studentService;
     private final Logger LOG = LoggerFactory.getLogger(StudentController.class);
-
     public StudentController(StudentService studentService) {
         this.studentService = studentService;
     }
-
-    @PostMapping
-    public StudentDto save(@RequestBody StudentDto dto) {
-        LOG.debug("start method save :{}", dto);
-        StudentDto studentDto = studentService.create(dto);
-        LOG.debug("end method save");
-        return studentDto;
-    }
-
-    @PutMapping
-    public boolean update(@RequestBody StudentDto dto) {
-        LOG.debug("start method update: {}", dto);
-        Boolean bool = studentService.update(dto);
-        LOG.debug("end method update");
-        return bool;
-    }
-
-    @DeleteMapping(path = "{studentId}")
-    public boolean delete(@PathVariable("studentId") Long id) {
-        LOG.debug("start method delete: {}", id);
-        Boolean bool = studentService.delete(id);
-        LOG.debug("end method delete");
-        return bool;
-    }
-
     @GetMapping
     public List<StudentDto> readAll() {
         LOG.debug("start method read All");
         List<StudentDto> studentDtoList =  studentService.readAll();
-        LOG.debug("end method read All");
         return studentDtoList;
     }
+    @GetMapping("/{id}/{code}")
+    public StudentDto findStudentById(@PathVariable("id") Long id,@PathVariable("code") String code) {
+        StudentIdDto studentIdDto = new StudentIdDto(id, code);
+        LOG.debug("find student by id method {}", studentIdDto);
+        StudentDto student = studentService.findStudentById(studentIdDto);
+        return student;
+    }
+
+    @PostMapping
+    public Long save(@RequestBody StudentDto dto) {
+        LOG.debug("start method save :{}", dto);
+        return  studentService.create(dto);
+    }
+
+    @PutMapping
+    public Long update(@RequestBody StudentDto dto) {
+        LOG.debug("start method update: {}", dto);
+        return studentService.update(dto);
+    }
+
+    @DeleteMapping("/{id}/{code}")
+    public boolean delete(@PathVariable("id") Long id,@PathVariable("code") String code) {
+        StudentIdDto studentIdDto = new StudentIdDto(id, code);
+        LOG.debug("start method delete: {}", studentIdDto);
+        return studentService.delete(studentIdDto);
+    }
+
 }

@@ -1,24 +1,30 @@
 package ma.pfe.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
-@Table(name="T_student")
+@Table(name="student")
 public class StudentEntity {
-    @Id
-    private long id;
+    @EmbeddedId
+    private StudentId studentId;
+    @Column(name = "student_name")
     private String name;
-    private String password;
+    @Embedded
+    private Adresse adresse;
+
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER) @JoinTable(name = "tab_courses")
+    private List<CourseEntity> courses;
 
 
-    public long getId() {
-        return id;
+
+    public List<CourseEntity> getCourses() {
+        return courses;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setCourses(List<CourseEntity> courses) {
+        this.courses = courses;
     }
 
     public String getName() {
@@ -29,11 +35,30 @@ public class StudentEntity {
         this.name = name;
     }
 
+    public StudentId getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(StudentId studentId) {
+        this.studentId = studentId;
+    }
+
+
+    public Adresse getAdresse() {
+        return adresse;
+    }
+
+    public void setAdresse(Adresse adresse) {
+        this.adresse = adresse;
+    }
+
     @Override
     public String toString() {
         return "StudentEntity{" +
-                "id=" + id +
+                "studentId=" + studentId +
                 ", name='" + name + '\'' +
+                ", adresse=" + adresse +
+                ", courses=" + courses +
                 '}';
     }
 }

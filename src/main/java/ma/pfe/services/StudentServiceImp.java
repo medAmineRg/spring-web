@@ -1,61 +1,60 @@
 package ma.pfe.services;
 
 import ma.pfe.dtos.StudentDto;
-import ma.pfe.entities.StudentEntity;
+import ma.pfe.dtos.StudentIdDto;
 import ma.pfe.mappers.StudentMapper;
 import ma.pfe.repositories.StudentRepository;
+import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
-public class StudentServiceImp implements  StudentService{
+public class StudentServiceImp implements StudentService{
 
     private final Logger LOG = LoggerFactory.getLogger(StudentServiceImp.class);
-    StudentRepository studentRepository;
-    StudentMapper studentMapper ;
+    private StudentRepository studentRepository;
+    private static final StudentMapper studentMapper = Mappers.getMapper(StudentMapper.class);
 
-    public StudentServiceImp(StudentRepository studentRepository, StudentMapper studentMapper) {
+    public StudentServiceImp(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
-        this.studentMapper = studentMapper;
-    }
-
-    @Override
-    public StudentDto create(StudentDto studentDto) {
-
-        LOG.debug("start method create");
-        StudentEntity studentEntity = studentRepository.create(studentMapper.convertToEntity(studentDto));
-        LOG.debug("end method create");
-        return studentMapper.convertToDto(studentEntity);
-    }
-
-    @Override
-    public boolean update(StudentDto studentDto) {
-
-        LOG.debug("start method update");
-        boolean bool = studentRepository.update(studentMapper.convertToEntity(studentDto));
-        LOG.debug("end method update");
-        return bool;
-    }
-
-    @Override
-    public boolean delete(Long id) {
-
-        LOG.debug("start method delete");
-        boolean bool = studentRepository.delete(id);
-        LOG.debug("end method delete");
-        return bool;
     }
 
     @Override
     public List<StudentDto> readAll() {
-        LOG.debug("start method read all");
-        List<StudentDto> studentDtoList = studentMapper.convertToDto(studentRepository.readAll());
-        LOG.debug("end method read all");
-        return studentDtoList;
+        LOG.debug("start method readall dto : {} ");
+        return studentMapper.studentEntiesToDtos(studentRepository.findAll());
     }
+    @Override
+    public StudentDto findStudentById(StudentIdDto idDto) {
+        LOG.debug("start method findStudentById: {} ");
+        return studentMapper.studentEntityToDto(
+                studentRepository
+                        .findById(
+                                studentMapper
+                                        .studentIdDtoToStudentId(idDto)).orElse(null));
+
+    }
+    @Override
+    public Long create(StudentDto studentDto) {
+        LOG.debug("start method create dto : {} ", studentDto);
+        StudentDto student = studentMapper.studentEntityToDto(studentRepository.save(studentMapper.studentDtoToEntity(studentDto)));
+        return student.getStudentId().getId();
+    }
+
+    @Override
+    public Long update(StudentDto studentDto) {
+
+        LOG.debug("start method update dto : {} ", studentDto);
+        StudentDto student = studentMapper.studentEntityToDto(studentRepository.save(studentMapper.studentDtoToEntity(studentDto)));
+        return student.getStudentId().getId();
+    }
+    @Override
+    public boolean delete(StudentIdDto id) {
+        LOG.debug("start method delete dto : {} ", id);
+        studentRepository.deleteById(studentMapper.studentIdDtoToStudentId(id));
+        return true;
+    }
+
 }
