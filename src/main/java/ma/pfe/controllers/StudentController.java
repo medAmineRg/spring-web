@@ -1,8 +1,12 @@
 package ma.pfe.controllers;
 
+
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import ma.pfe.dtos.StudentDto;
 import ma.pfe.dtos.StudentIdDto;
 import ma.pfe.services.StudentService;
@@ -15,7 +19,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/student")
-@SecurityRequirement(name = "studentApi")
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Student", description = "The Student API. Contains all the operations that can be performed on a user.")
 public class StudentController {
     private StudentService studentService;
     private final Logger LOG = LoggerFactory.getLogger(StudentController.class);

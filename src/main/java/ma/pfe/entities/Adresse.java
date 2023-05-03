@@ -1,6 +1,8 @@
 package ma.pfe.entities;
 
-import jakarta.persistence.Embeddable;
+
+import javax.persistence.Embeddable;
+
 @Embeddable
 public class Adresse {
     private String rue;

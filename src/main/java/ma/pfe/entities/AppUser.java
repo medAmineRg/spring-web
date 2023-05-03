@@ -1,7 +1,10 @@
 package ma.pfe.entities;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.persistence.*;
+
+import java.util.ArrayList;
 import java.util.Collection;
 
 
@@ -11,8 +14,9 @@ public class AppUser {
     private Long id;
     private String username;
     private String password;
-    @ManyToMany
-    private Collection<AppRole> userRoles;
+
+    @ManyToMany(fetch = FetchType.EAGER) @JoinTable(name = "user_role")
+    private Collection<AppRole> userRoles = new ArrayList<>();
 
     public AppUser() {
     }
